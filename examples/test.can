@@ -1,0 +1,49 @@
+/*
+ * 基础 CAPL 测试程序
+ * 演示基本的变量声明和事件处理
+ */
+
+variables {
+    int counter = 0;
+    message 0x100 EngineData;
+    message 0x200 VehicleSpeed;
+}
+
+on start {
+    write("CAPL 测试程序启动");
+    counter = 0;
+    setTimer(heartbeat, 1000);  // 设置1秒心跳定时器
+}
+
+on message EngineData {
+    write("收到引擎数据: ID = 0x%X", this.id);
+    counter++;
+    
+    // 解析引擎数据
+    int rpm = this.byte(0) | (this.byte(1) << 8);
+    int temp = this.byte(2);
+    
+    write("引擎转速: %d RPM, 温度: %d°C", rpm, temp);
+}
+
+on message VehicleSpeed {
+    write("收到车速数据: ID = 0x%X", this.id);
+    
+    // 解析车速数据
+    int speed = this.byte(0) | (this.byte(1) << 8);
+    write("当前车速: %d km/h", speed);
+}
+
+on timer heartbeat {
+    write("心跳 - 已处理 %d 条消息", counter);
+    setTimer(heartbeat, 1000);  // 重新设置定时器
+}
+
+on key 'r' {
+    write("重置计数器");
+    counter = 0;
+}
+
+on stop {
+    write("CAPL 测试程序停止");
+}

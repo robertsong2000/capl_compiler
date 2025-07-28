@@ -1,0 +1,11 @@
+// 简单的语法正确的CAPL文件
+variables {
+    int counter;
+    float temperature;
+    char status;
+}
+
+on start {
+    counter = 0;
+    temperature = 25.5;
+}

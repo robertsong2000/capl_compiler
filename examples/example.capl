@@ -1,0 +1,47 @@
+/*
+ * 示例 CAPL 程序
+ * 演示基本的 CAN 消息处理
+ */
+
+variables {
+    int counter = 0;
+    message 0x123 TestMessage;
+}
+
+on start {
+    write("CAPL 程序启动");
+    counter = 0;
+}
+
+on message TestMessage {
+    write("收到测试消息: ID = 0x%X", this.id);
+    counter++;
+    
+    if (counter > 10) {
+        write("已处理 %d 条消息", counter);
+        counter = 0;
+    }
+}
+
+on timer myTimer {
+    write("定时器触发");
+    TestMessage.byte(0) = counter;
+    output(TestMessage);
+}
+
+void sendTestMessage() {
+    TestMessage.id = 0x123;
+    TestMessage.dlc = 8;
+    TestMessage.byte(0) = 0x01;
+    TestMessage.byte(1) = 0x02;
+    output(TestMessage);
+}
+
+on key 'a' {
+    write("按键 'a' 被按下");
+    sendTestMessage();
+}
+
+on stop {
+    write("CAPL 程序停止");
+}

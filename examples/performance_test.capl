@@ -1,0 +1,99 @@
+// 性能测试文件
+// 测试编译器处理大量代码的能力
+
+variables {
+    int performance_counter;
+    float data_array[100];
+    message msg_buffer[50];
+}
+
+on start {
+    performance_counter = 0;
+    
+    // 初始化大数组
+    for (int i = 0; i < 100; i++) {
+        data_array[i] = i * 3.14159;
+    }
+    
+    write("Performance test started");
+}
+
+// 生成多个相似的消息处理器来测试编译器性能
+on message 0x200 {
+    performance_counter++;
+    this.data[0] = performance_counter;
+    output(this);
+}
+
+on message 0x201 {
+    performance_counter++;
+    this.data[0] = performance_counter;
+    output(this);
+}
+
+on message 0x202 {
+    performance_counter++;
+    this.data[0] = performance_counter;
+    output(this);
+}
+
+on message 0x203 {
+    performance_counter++;
+    this.data[0] = performance_counter;
+    output(this);
+}
+
+on message 0x204 {
+    performance_counter++;
+    this.data[0] = performance_counter;
+    output(this);
+}
+
+// 多个定时器测试
+on timer perf_timer1 {
+    for (int i = 0; i < 10; i++) {
+        data_array[i] = data_array[i] * 1.1;
+    }
+    setTimer(perf_timer1, 100);
+}
+
+on timer perf_timer2 {
+    for (int i = 10; i < 20; i++) {
+        data_array[i] = data_array[i] * 1.2;
+    }
+    setTimer(perf_timer2, 200);
+}
+
+on timer perf_timer3 {
+    for (int i = 20; i < 30; i++) {
+        data_array[i] = data_array[i] * 1.3;
+    }
+    setTimer(perf_timer3, 300);
+}
+
+// 复杂的计算函数
+function float calculate_average(int start_index, int end_index) {
+    float sum = 0.0;
+    int count = 0;
+    
+    for (int i = start_index; i < end_index; i++) {
+        sum = sum + data_array[i];
+        count++;
+    }
+    
+    if (count > 0) {
+        return sum / count;
+    } else {
+        return 0.0;
+    }
+}
+
+// 测试函数调用
+on key 'p' {
+    float avg1 = calculate_average(0, 25);
+    float avg2 = calculate_average(25, 50);
+    float avg3 = calculate_average(50, 75);
+    float avg4 = calculate_average(75, 100);
+    
+    write("Averages calculated");
+}

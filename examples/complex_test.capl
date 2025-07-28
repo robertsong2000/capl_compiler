@@ -1,0 +1,74 @@
+// 复杂功能测试文件
+// 测试编译器对复杂语法结构的处理能力
+
+variables {
+    int counter;
+    float temperature;
+    char status[10];
+    message test_msg;
+}
+
+// 测试复杂的变量初始化
+on start {
+    counter = 0;
+    temperature = 25.5;
+    status = "READY";
+    
+    // 测试循环结构
+    for (int i = 0; i < 10; i++) {
+        counter = counter + i;
+    }
+    
+    // 测试条件语句
+    if (temperature > 30.0) {
+        status = "HOT";
+    } else if (temperature < 10.0) {
+        status = "COLD";
+    } else {
+        status = "NORMAL";
+    }
+    
+    // 测试函数调用
+    write("System initialized");
+    setTimer(timer1, 1000);
+}
+
+// 测试消息处理
+on message 0x100 {
+    counter++;
+    
+    // 测试消息数据访问
+    this.data[0] = counter;
+    this.data[1] = (byte)temperature;
+    
+    // 测试消息发送
+    output(this);
+}
+
+// 测试定时器处理
+on timer timer1 {
+    temperature = temperature + 0.1;
+    
+    // 测试数组操作
+    for (int j = 0; j < 8; j++) {
+        this.data[j] = j * 2;
+    }
+    
+    // 重新设置定时器
+    setTimer(timer1, 1000);
+}
+
+// 测试键盘事件
+on key 'a' {
+    write("Key 'a' pressed");
+    counter = 0;
+}
+
+// 测试环境变量
+on envVar temperature_sensor {
+    temperature = getValue(this);
+    
+    if (temperature > 50.0) {
+        write("Warning: High temperature!");
+    }
+}

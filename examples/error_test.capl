@@ -1,0 +1,20 @@
+// 包含语法错误的 CAPL 文件
+variables {
+    int counter = ;  // 语法错误：缺少值
+    message 0x123 TestMessage
+}  // 语法错误：缺少分号
+
+on start {
+    write("测试")
+    counter = 10  // 语法错误：缺少分号
+    undefinedFunction();  // 语义错误：未定义的函数
+}
+
+on message TestMessage {
+    write("收到消息: ID = 0x%X", this.id);
+    counter++;
+    
+    if (counter > 10 {  // 语法错误：缺少右括号
+        write("计数器: %d", counter);
+    }
+}

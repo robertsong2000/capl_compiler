@@ -1,0 +1,44 @@
+// 中等复杂度测试文件
+// 测试当前解析器支持的语法特性
+
+variables {
+    int counter;
+    float temperature;
+    char status;
+}
+
+on start {
+    counter = 0;
+    temperature = 25.5;
+    status = 'A';
+    
+    // 测试条件语句
+    if (counter == 0) {
+        temperature = 30.0;
+    }
+    
+    // 测试循环
+    while (counter < 5) {
+        counter = counter + 1;
+    }
+}
+
+on message {
+    counter = counter + 1;
+    
+    if (temperature > 25.0) {
+        status = 'H';
+    } else {
+        status = 'L';
+    }
+}
+
+on timer {
+    temperature = temperature + 1.0;
+}
+
+on key {
+    counter = 0;
+    temperature = 20.0;
+    status = 'R';
+}

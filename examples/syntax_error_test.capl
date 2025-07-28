@@ -1,0 +1,50 @@
+// 语法错误测试文件
+// 这个文件包含故意的语法错误，用于测试编译器的错误处理能力
+
+variables {
+    // 缺少分号的变量声明
+    int test_var
+    
+    // 无效的变量类型
+    invalid_type another_var;
+    
+    // 重复的变量声明
+    int duplicate_var;
+    int duplicate_var;
+}
+
+// 缺少大括号的函数
+on start {
+    // 未声明的变量
+    undefined_var = 10;
+    
+    // 语法错误的表达式
+    test_var = 5 +;
+    
+    // 缺少分号
+    test_var = 20
+    
+    // 无效的函数调用
+    invalid_function(;
+}
+
+// 缺少结束大括号的事件处理器
+on message 0x123 {
+    // 无效的消息数据访问
+    this.invalid_field = 10;
+    
+    // 错误的数组访问
+    this.data[] = 5;
+
+// 缺少结束大括号
+
+// 无效的事件类型
+on invalid_event {
+    // 空的事件处理器
+}
+
+// 语法错误的定时器
+on timer invalid_timer {
+    // 错误的定时器重置
+    setTimer(;
+}

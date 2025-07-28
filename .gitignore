@@ -1,0 +1,111 @@
+# 编译生成的文件
+*.o
+*.obj
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# 构建目录
+build/
+bin/
+dist/
+out/
+
+# 编译器生成的输出文件
+*.cbf
+*.capl.cbf
+*_ast.txt
+*_tokens.txt
+
+# IDE 和编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# CMake 生成的文件
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile.cmake
+*.cmake
+!CMakeLists.txt
+
+# 调试文件
+*.dSYM/
+*.pdb
+*.ilk
+*.map
+*.exp
+
+# 日志文件
+*.log
+*.tmp
+*.temp
+
+# 测试文件（保留示例文件）
+test_*.capl
+temp_*.capl
+debug_*.capl
+
+# 备份文件
+*.bak
+*.backup
+*.orig
+
+# 压缩文件
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# 系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 依赖管理
+node_modules/
+.npm
+.yarn/
+
+# 环境配置
+.env
+.env.local
+.env.*.local
+
+# 文档生成
+docs/html/
+docs/latex/
+*.pdf
+!README.pdf
+
+# 性能分析
+*.prof
+*.trace
+callgrind.out.*
+perf.data*
+
+# 覆盖率报告
+*.gcov
+*.gcda
+*.gcno
+coverage/
+htmlcov/
+
+# 静态分析
+.clang_complete
+.ycm_extra_conf.py*
+compile_commands.json
