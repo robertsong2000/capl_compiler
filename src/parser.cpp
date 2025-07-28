@@ -169,27 +169,65 @@ std::unique_ptr<ASTNode> Parser::parseVariablesBlock() {
 std::unique_ptr<ASTNode> Parser::parseVariableDeclaration() {
     auto var_decl = std::make_unique<ASTNode>(ASTNodeType::VARIABLE_DECL);
     
-    // 期望类型（int, float, char 等）
+    // 期望类型（int, float, char, message 等）
     if (current_token_.getType() != TokenType::INT && 
         current_token_.getType() != TokenType::FLOAT_KW &&
-        current_token_.getType() != TokenType::CHAR_KW) {
-        reportError("期望变量类型 (int, float, char), 但得到 '" + current_token_.getValue() + "'");
+        current_token_.getType() != TokenType::CHAR_KW &&
+        current_token_.getType() != TokenType::MESSAGE) {
+        reportError("期望变量类型 (int, float, char, message), 但得到 '" + current_token_.getValue() + "'");
         // 跳过错误的token，避免无限循环
         advance();
         return nullptr;
     }
     
+    bool is_message = (current_token_.getType() == TokenType::MESSAGE);
     advance(); // 跳过类型
     
-    // 期望变量名
-    if (current_token_.getType() != TokenType::IDENTIFIER) {
-        reportError("期望变量名");
-        // 跳过错误的token，避免无限循环
-        advance();
-        return nullptr;
+    if (is_message) {
+        // message 类型的特殊处理: message 0x100 EngineData;
+        // 期望 message ID（如 0x100）
+        if (current_token_.getType() == TokenType::INTEGER) {
+            advance(); // 跳过 message ID
+        } else {
+            reportError("期望 message ID");
+            return nullptr;
+        }
+        
+        // 期望 message 名称
+        if (current_token_.getType() != TokenType::IDENTIFIER) {
+            reportError("期望 message 名称");
+            return nullptr;
+        }
+        advance(); // 跳过 message 名称
+        
+    } else {
+        // 普通类型的处理: int counter = 0;
+        // 期望变量名
+        if (current_token_.getType() != TokenType::IDENTIFIER) {
+            reportError("期望变量名");
+            // 跳过错误的token，避免无限循环
+            advance();
+            return nullptr;
+        }
+        
+        advance(); // 跳过变量名
+        
+        // 检查是否有初始化（= value）
+        if (current_token_.getType() == TokenType::ASSIGN) {
+            advance(); // 跳过 '='
+            
+            // 期望初始化值（整数、浮点数、字符等）
+            if (current_token_.getType() == TokenType::INTEGER ||
+                current_token_.getType() == TokenType::FLOAT ||
+                current_token_.getType() == TokenType::CHAR ||
+                current_token_.getType() == TokenType::STRING) {
+                advance(); // 跳过初始化值
+            } else {
+                reportError("期望初始化值");
+                return nullptr;
+            }
+        }
     }
-    
-    advance(); // 跳过变量名
     
     // 期望分号
     if (!expect(TokenType::SEMICOLON)) {
@@ -211,19 +249,35 @@ std::unique_ptr<ASTNode> Parser::parseEventHandler() {
     }
     
     // 解析事件类型
-    if (current_token_.getType() == TokenType::START ||
-        current_token_.getType() == TokenType::MESSAGE ||
-        current_token_.getType() == TokenType::TIMER ||
-        current_token_.getType() == TokenType::KEY) {
+    TokenType event_type = current_token_.getType();
+    if (event_type == TokenType::START ||
+        event_type == TokenType::MESSAGE ||
+        event_type == TokenType::TIMER ||
+        event_type == TokenType::KEY) {
         advance();
     } else {
         reportError("期望事件类型 (start, message, timer, key)");
         return nullptr;
     }
     
-    // 如果是 message 事件，可能有 ID
-    if (current_token_.getType() == TokenType::INTEGER) {
-        advance();
+    // 根据事件类型处理不同的参数
+    if (event_type == TokenType::MESSAGE) {
+        // message 事件可能有 ID 或者消息名称
+        if (current_token_.getType() == TokenType::INTEGER) {
+            advance(); // 跳过消息ID
+        } else if (current_token_.getType() == TokenType::IDENTIFIER) {
+            advance(); // 跳过消息名称
+        }
+    } else if (event_type == TokenType::TIMER) {
+        // timer 事件需要定时器名称
+        if (current_token_.getType() == TokenType::IDENTIFIER) {
+            advance(); // 跳过定时器名称
+        }
+    } else if (event_type == TokenType::KEY) {
+        // key 事件需要按键字符
+        if (current_token_.getType() == TokenType::CHAR) {
+            advance(); // 跳过按键字符
+        }
     }
     
     // 期望左大括号

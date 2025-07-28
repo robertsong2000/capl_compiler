@@ -69,16 +69,38 @@ Token Lexer::nextToken() {
     if (std::isdigit(current)) {
         std::string number;
         bool isFloat = false;
+        bool isHex = false;
         
-        while (position_ < source_.length() && 
-               (std::isdigit(source_[position_]) || source_[position_] == '.')) {
-            if (source_[position_] == '.') {
-                if (isFloat) break; // 第二个小数点，停止
-                isFloat = true;
-            }
-            number += source_[position_];
+        // 检查是否是十六进制数字 (0x 或 0X)
+        if (current == '0' && position_ + 1 < source_.length() && 
+            (source_[position_ + 1] == 'x' || source_[position_ + 1] == 'X')) {
+            isHex = true;
+            number += source_[position_]; // '0'
             position_++;
             column_++;
+            number += source_[position_]; // 'x' 或 'X'
+            position_++;
+            column_++;
+            
+            // 读取十六进制数字
+            while (position_ < source_.length() && 
+                   std::isxdigit(source_[position_])) {
+                number += source_[position_];
+                position_++;
+                column_++;
+            }
+        } else {
+            // 处理十进制数字
+            while (position_ < source_.length() && 
+                   (std::isdigit(source_[position_]) || source_[position_] == '.')) {
+                if (source_[position_] == '.') {
+                    if (isFloat) break; // 第二个小数点，停止
+                    isFloat = true;
+                }
+                number += source_[position_];
+                position_++;
+                column_++;
+            }
         }
         
         return Token(isFloat ? TokenType::FLOAT : TokenType::INTEGER, 
