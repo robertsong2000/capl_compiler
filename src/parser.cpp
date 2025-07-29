@@ -184,13 +184,10 @@ std::unique_ptr<ASTNode> Parser::parseVariableDeclaration() {
     advance(); // 跳过类型
     
     if (is_message) {
-        // message 类型的特殊处理: message 0x100 EngineData;
-        // 期望 message ID（如 0x100）
+        // message 类型的特殊处理: message 0x100 EngineData; 或 message test_msg;
+        // 检查是否有 message ID（可选）
         if (current_token_.getType() == TokenType::INTEGER) {
             advance(); // 跳过 message ID
-        } else {
-            reportError("期望 message ID");
-            return nullptr;
         }
         
         // 期望 message 名称
@@ -201,7 +198,7 @@ std::unique_ptr<ASTNode> Parser::parseVariableDeclaration() {
         advance(); // 跳过 message 名称
         
     } else {
-        // 普通类型的处理: int counter = 0;
+        // 普通类型的处理: int counter = 0; 或 char status[10];
         // 期望变量名
         if (current_token_.getType() != TokenType::IDENTIFIER) {
             reportError("期望变量名");
@@ -211,6 +208,24 @@ std::unique_ptr<ASTNode> Parser::parseVariableDeclaration() {
         }
         
         advance(); // 跳过变量名
+        
+        // 检查是否是数组声明 [size]
+        if (current_token_.getType() == TokenType::LEFT_BRACKET) {
+            advance(); // 跳过 '['
+            
+            // 期望数组大小（整数）
+            if (current_token_.getType() == TokenType::INTEGER) {
+                advance(); // 跳过数组大小
+            } else {
+                reportError("期望数组大小");
+                return nullptr;
+            }
+            
+            // 期望 ']'
+            if (!expect(TokenType::RIGHT_BRACKET)) {
+                return nullptr;
+            }
+        }
         
         // 检查是否有初始化（= value）
         if (current_token_.getType() == TokenType::ASSIGN) {
