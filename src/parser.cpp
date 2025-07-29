@@ -251,12 +251,13 @@ std::unique_ptr<ASTNode> Parser::parseEventHandler() {
     // 解析事件类型
     TokenType event_type = current_token_.getType();
     if (event_type == TokenType::START ||
+        event_type == TokenType::STOP ||
         event_type == TokenType::MESSAGE ||
         event_type == TokenType::TIMER ||
         event_type == TokenType::KEY) {
         advance();
     } else {
-        reportError("期望事件类型 (start, message, timer, key)");
+        reportError("期望事件类型 (start, stop, message, timer, key)");
         return nullptr;
     }
     
@@ -378,6 +379,22 @@ std::unique_ptr<ASTNode> Parser::parseAssignmentOrCall() {
         if (!expect(TokenType::RIGHT_PAREN)) {
             return nullptr;
         }
+        
+        // 期望分号
+        if (!expect(TokenType::SEMICOLON)) {
+            return nullptr;
+        }
+    } else if (current_token_.getType() == TokenType::INCREMENT) {
+        // 后置自增操作符
+        advance(); // 跳过 ++
+        
+        // 期望分号
+        if (!expect(TokenType::SEMICOLON)) {
+            return nullptr;
+        }
+    } else if (current_token_.getType() == TokenType::DECREMENT) {
+        // 后置自减操作符
+        advance(); // 跳过 --
         
         // 期望分号
         if (!expect(TokenType::SEMICOLON)) {

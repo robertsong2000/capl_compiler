@@ -201,8 +201,20 @@ Token Lexer::nextToken() {
     column_++;
     
     switch (current) {
-        case '+': return Token(TokenType::PLUS, "+", line_, start_column);
-        case '-': return Token(TokenType::MINUS, "-", line_, start_column);
+        case '+':
+            if (position_ < source_.length() && source_[position_] == '+') {
+                position_++;
+                column_++;
+                return Token(TokenType::INCREMENT, "++", line_, start_column);
+            }
+            return Token(TokenType::PLUS, "+", line_, start_column);
+        case '-':
+            if (position_ < source_.length() && source_[position_] == '-') {
+                position_++;
+                column_++;
+                return Token(TokenType::DECREMENT, "--", line_, start_column);
+            }
+            return Token(TokenType::MINUS, "-", line_, start_column);
         case '*': return Token(TokenType::MULTIPLY, "*", line_, start_column);
         case '/': return Token(TokenType::DIVIDE, "/", line_, start_column);
         case '=': 
